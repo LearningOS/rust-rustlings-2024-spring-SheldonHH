@@ -5,9 +5,17 @@
 */
 // I AM NOT DONE
 
-fn sort<T>(array: &mut [T]){
-	//TODO
+fn sort<T: PartialOrd>(array: &mut [T]) {
+    let len = array.len();
+    for i in 1..len {
+        let mut j = i;
+        while j > 0 && array[j] < array[j - 1] {
+            array.swap(j, j - 1);
+            j -= 1;
+        }
+    }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -24,6 +32,8 @@ mod tests {
         sort(&mut vec);
         assert_eq!(vec, vec![1]);
     }
+
+    // 逆序数组的测试用例。这种情况下，插入排序需要做最大数量的元素交换，但最终数组应该以升序排列。
 	#[test]
     fn test_sort_3() {
         let mut vec = vec![99, 88, 77, 66, 55, 44, 33, 22, 11];
