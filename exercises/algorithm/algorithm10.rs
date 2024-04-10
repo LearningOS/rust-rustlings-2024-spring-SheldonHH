@@ -36,13 +36,33 @@ pub trait Graph {
     fn new() -> Self;
     fn adjacency_table_mutable(&mut self) -> &mut HashMap<String, Vec<(String, i32)>>;
     fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
+    // Add a node to the graph
     fn add_node(&mut self, node: &str) -> bool {
-        //TODO
-		true
+        // 检查节点是否已存在
+        if self.adjacency_table().contains_key(node) {
+            false // 节点已存在，不添加
+        } else {
+            // 节点不存在，添加并返回 true
+            self.adjacency_table_mutable().insert(node.to_string(), Vec::new());
+            true
+        }
     }
+    // Add an edge to the graph
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        // 解构边的元素
+        let (from, to, weight) = edge;
+        // 添加从 from 到 to 的边
+        self.adjacency_table_mutable()
+            .entry(from.to_string())
+            .or_insert_with(Vec::new)
+            .push((to.to_string(), weight));
+        // 由于是无向图，还需要添加从 to 到 from 的边
+        self.adjacency_table_mutable()
+            .entry(to.to_string())
+            .or_insert_with(Vec::new)
+            .push((from.to_string(), weight));
     }
+    
     fn contains(&self, node: &str) -> bool {
         self.adjacency_table().get(node).is_some()
     }

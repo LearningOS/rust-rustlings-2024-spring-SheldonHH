@@ -1,0 +1,1 @@
+algorithm7: stack
