@@ -4,6 +4,7 @@
 	you can use bubble sorting, insertion sorting, heap sorting, etc.
 */
 
+// ✅
 fn sort<T: PartialOrd>(array: &mut [T]) {
     let len = array.len();
     for i in 1..len {
