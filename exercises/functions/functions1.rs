@@ -1,10 +1,8 @@
-// functions1.rs
-//
-// Execute `rustlings hint functions1` or use the `hint` watch subcommand for a
-// hint.
-
-// I AM NOT DONE
-
 fn main() {
-    call_me();
+    let number = 10; // 假设这是我们要传入的参数
+    call_me(number); // 正确传入参数
+}
+
+fn call_me(num: u32) {
+    println!("Calling with number: {}", num);
 }

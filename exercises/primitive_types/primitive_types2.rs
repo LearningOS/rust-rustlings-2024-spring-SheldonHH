@@ -6,13 +6,10 @@
 // Execute `rustlings hint primitive_types2` or use the `hint` watch subcommand
 // for a hint.
 
-// I AM NOT DONE
-
 fn main() {
-    // Characters (`char`)
+    // 字符（`char`）
 
-    // Note the _single_ quotes, these are different from the double quotes
-    // you've been seeing around.
+    // 注意使用的是单引号，这和你之前看到的双引号不同。
     let my_first_initial = 'C';
     if my_first_initial.is_alphabetic() {
         println!("Alphabetical!");
@@ -22,9 +19,9 @@ fn main() {
         println!("Neither alphabetic nor numeric!");
     }
 
-    let // Finish this line like the example! What's your favorite character?
-    // Try a letter, try a number, try a special character, try a character
-    // from a different language than your own, try an emoji!
+    // 完成这一行，就像示例中的那样！你最喜欢的字符是什么？
+    // 试试字母，试试数字，试试特殊字符，试试不同语言的字符，试试表情符号！
+    let your_character = '🔥'; // 这里我选择了一个特殊字符作为示例
     if your_character.is_alphabetic() {
         println!("Alphabetical!");
     } else if your_character.is_numeric() {

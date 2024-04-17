@@ -33,13 +33,14 @@ fn main() {
         create_non_empty_list()
     );
 }
-
+//✅  todo!()
 pub fn create_empty_list() -> List {
-    todo!()
+    List::Nil // Return the Nil variant for an empty list
 }
 
 pub fn create_non_empty_list() -> List {
-    todo!()
+    // Return a non-empty list, e.g., Cons(42, Box::new(Nil))
+    List::Cons(42, Box::new(List::Nil))
 }
 
 #[cfg(test)]

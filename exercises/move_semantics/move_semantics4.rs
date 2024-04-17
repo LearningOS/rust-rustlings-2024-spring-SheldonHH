@@ -7,12 +7,9 @@
 // Execute `rustlings hint move_semantics4` or use the `hint` watch subcommand
 // for a hint.
 
-// I AM NOT DONE
-
 fn main() {
-    let vec0 = Vec::new();
-
-    let mut vec1 = fill_vec(vec0);
+    // 在这里不再需要初始化 vec0
+    let mut vec1 = fill_vec();  // 直接调用修改后的 fill_vec，它不需要参数
 
     println!("{} has length {} content `{:?}`", "vec1", vec1.len(), vec1);
 
@@ -21,9 +18,9 @@ fn main() {
     println!("{} has length {} content `{:?}`", "vec1", vec1.len(), vec1);
 }
 
-// `fill_vec()` no longer takes `vec: Vec<i32>` as argument
+// `fill_vec()` 不再接受参数，而是在函数内部创建和返回一个 Vec<i32>
 fn fill_vec() -> Vec<i32> {
-    let mut vec = vec;
+    let mut vec = Vec::new();  // 正确初始化一个空的向量
 
     vec.push(22);
     vec.push(44);

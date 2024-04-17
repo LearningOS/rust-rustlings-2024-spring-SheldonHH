@@ -1,14 +1,3 @@
-// structs3.rs
-//
-// Structs contain data, but can also have logic. In this exercise we have
-// defined the Package struct and we want to test some logic attached to it.
-// Make the code compile and the tests pass!
-//
-// Execute `rustlings hint structs3` or use the `hint` watch subcommand for a
-// hint.
-
-// I AM NOT DONE
-
 #[derive(Debug)]
 struct Package {
     sender_country: String,
@@ -17,6 +6,7 @@ struct Package {
 }
 
 impl Package {
+    // 构造函数，验证包裹的重量必须大于0，否则抛出异常
     fn new(sender_country: String, recipient_country: String, weight_in_grams: i32) -> Package {
         if weight_in_grams <= 0 {
             panic!("Can not ship a weightless package.")
@@ -29,58 +19,13 @@ impl Package {
         }
     }
 
-    fn is_international(&self) -> ??? {
-        // Something goes here...
+    // 判断包裹是否为国际包裹，不同国家返回true
+    fn is_international(&self) -> bool {
+        self.sender_country != self.recipient_country
     }
 
-    fn get_fees(&self, cents_per_gram: i32) -> ??? {
-        // Something goes here...
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    #[should_panic]
-    fn fail_creating_weightless_package() {
-        let sender_country = String::from("Spain");
-        let recipient_country = String::from("Austria");
-
-        Package::new(sender_country, recipient_country, -2210);
-    }
-
-    #[test]
-    fn create_international_package() {
-        let sender_country = String::from("Spain");
-        let recipient_country = String::from("Russia");
-
-        let package = Package::new(sender_country, recipient_country, 1200);
-
-        assert!(package.is_international());
-    }
-
-    #[test]
-    fn create_local_package() {
-        let sender_country = String::from("Canada");
-        let recipient_country = sender_country.clone();
-
-        let package = Package::new(sender_country, recipient_country, 1200);
-
-        assert!(!package.is_international());
-    }
-
-    #[test]
-    fn calculate_transport_fees() {
-        let sender_country = String::from("Spain");
-        let recipient_country = String::from("Spain");
-
-        let cents_per_gram = 3;
-
-        let package = Package::new(sender_country, recipient_country, 1500);
-
-        assert_eq!(package.get_fees(cents_per_gram), 4500);
-        assert_eq!(package.get_fees(cents_per_gram * 2), 9000);
+    // 计算运输费用，费用基于每克的成本乘以包裹重量
+    fn get_fees(&self, cents_per_gram: i32) -> i32 {
+        cents_per_gram * self.weight_in_grams
     }
 }

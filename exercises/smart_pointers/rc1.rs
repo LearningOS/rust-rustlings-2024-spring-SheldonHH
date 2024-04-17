@@ -34,7 +34,7 @@ impl Planet {
         println!("Hi from {:?}!", self)
     }
 }
-
+// 正确的做法应该是使用 Rc::clone(&sun) 来复制对现有 Sun 实例的引用，以保持所有行星共享同一个太阳实例的意图
 fn main() {
     let sun = Rc::new(Sun {});
     println!("reference count = {}", Rc::strong_count(&sun)); // 1 reference
@@ -59,18 +59,18 @@ fn main() {
     println!("reference count = {}", Rc::strong_count(&sun)); // 6 references
     jupiter.details();
 
-    // TODO
-    let saturn = Planet::Saturn(Rc::new(Sun {}));
+    // 修改TODO: 使用Rc::clone而不是Rc::new
+    let saturn = Planet::Saturn(Rc::clone(&sun));
     println!("reference count = {}", Rc::strong_count(&sun)); // 7 references
     saturn.details();
 
-    // TODO
-    let uranus = Planet::Uranus(Rc::new(Sun {}));
+    // 修改TODO: 使用Rc::clone而不是Rc::new
+    let uranus = Planet::Uranus(Rc::clone(&sun));
     println!("reference count = {}", Rc::strong_count(&sun)); // 8 references
     uranus.details();
 
-    // TODO
-    let neptune = Planet::Neptune(Rc::new(Sun {}));
+    // 修改TODO: 使用Rc::clone而不是Rc::new
+    let neptune = Planet::Neptune(Rc::clone(&sun));
     println!("reference count = {}", Rc::strong_count(&sun)); // 9 references
     neptune.details();
 
@@ -91,13 +91,13 @@ fn main() {
     drop(mars);
     println!("reference count = {}", Rc::strong_count(&sun)); // 4 references
 
-    // TODO
+    drop(earth);
     println!("reference count = {}", Rc::strong_count(&sun)); // 3 references
 
-    // TODO
+    drop(venus);
     println!("reference count = {}", Rc::strong_count(&sun)); // 2 references
 
-    // TODO
+    drop(mercury);
     println!("reference count = {}", Rc::strong_count(&sun)); // 1 reference
 
     assert_eq!(Rc::strong_count(&sun), 1);
