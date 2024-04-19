@@ -1,79 +1,82 @@
-use std::collections::HashMap;
+use std::num::ParseIntError;
 
-struct Team {
-    goals_scored: u8,
-    goals_conceded: u8,
+#[derive(PartialEq, Debug)]
+enum ParsePosNonzeroError {
+    Creation(CreationError),
+    ParseInt(ParseIntError),
 }
 
-fn build_scores_table(results: String) -> HashMap<String, Team> {
-    let mut scores: HashMap<String, Team> = HashMap::new();
-
-    for r in results.lines() {
-        let v: Vec<&str> = r.split(',').collect();
-        let team_1_name = v[0].to_string();
-        let team_2_name = v[1].to_string();
-        let team_1_score: u8 = v[2].parse().unwrap();
-        let team_2_score: u8 = v[3].parse().unwrap();
-
-        // 更新或插入第一个队伍的数据
-        scores.entry(team_1_name.clone()).and_modify(|e| {
-            e.goals_scored += team_1_score;
-            e.goals_conceded += team_2_score;
-        }).or_insert(Team {
-            goals_scored: team_1_score,
-            goals_conceded: team_2_score,
-        });
-
-        // 更新或插入第二个队伍的数据
-        scores.entry(team_2_name.clone()).and_modify(|e| {
-            e.goals_scored += team_2_score;
-            e.goals_conceded += team_1_score;
-        }).or_insert(Team {
-            goals_scored: team_2_score,
-            goals_conceded: team_1_score,
-        });
+impl From<ParseIntError> for ParsePosNonzeroError {
+    fn from(err: ParseIntError) -> ParsePosNonzeroError {
+        ParsePosNonzeroError::ParseInt(err)
     }
-    scores
+}
+
+impl From<CreationError> for ParsePosNonzeroError {
+    fn from(err: CreationError) -> ParsePosNonzeroError {
+        ParsePosNonzeroError::Creation(err)
+    }
+}
+
+fn parse_pos_nonzero(s: &str) -> Result<PositiveNonzeroInteger, ParsePosNonzeroError> {
+    let x: Result<i64, ParseIntError> = s.parse();
+    match x {
+        Ok(x) => PositiveNonzeroInteger::new(x).map_err(ParsePosNonzeroError::from),
+        Err(e) => Err(ParsePosNonzeroError::from(e)),
+    }
+}
+
+#[derive(PartialEq, Debug)]
+struct PositiveNonzeroInteger(u64);
+
+#[derive(PartialEq, Debug)]
+enum CreationError {
+    Negative,
+    Zero,
+}
+
+impl PositiveNonzeroInteger {
+    fn new(value: i64) -> Result<PositiveNonzeroInteger, CreationError> {
+        match value {
+            x if x < 0 => Err(CreationError::Negative),
+            x if x == 0 => Err(CreationError::Zero),
+            x => Ok(PositiveNonzeroInteger(x as u64)),
+        }
+    }
 }
 
 #[cfg(test)]
-mod tests {
+mod test {
     use super::*;
 
-    fn get_results() -> String {
-        let results = "".to_string()
-            + "England,France,4,2\n"
-            + "France,Italy,3,1\n"
-            + "Poland,Spain,2,0\n"
-            + "Germany,England,2,1\n";
-        results
+    #[test]
+    fn test_parse_error() {
+        assert!(matches!(
+            parse_pos_nonzero("not a number"),
+            Err(ParsePosNonzeroError::ParseInt(_))
+        ));
     }
 
     #[test]
-    fn build_scores() {
-        let scores = build_scores_table(get_results());
-
-        let mut keys: Vec<&String> = scores.keys().collect();
-        keys.sort();
+    fn test_negative() {
         assert_eq!(
-            keys,
-            vec!["England", "France", "Germany", "Italy", "Poland", "Spain"]
+            parse_pos_nonzero("-555"),
+            Err(ParsePosNonzeroError::Creation(CreationError::Negative))
         );
     }
 
     #[test]
-    fn validate_team_score_1() {
-        let scores = build_scores_table(get_results());
-        let team = scores.get("England").unwrap();
-        assert_eq!(team.goals_scored, 5);
-        assert_eq!(team.goals_conceded, 4);
+    fn test_zero() {
+        assert_eq!(
+            parse_pos_nonzero("0"),
+            Err(ParsePosNonzeroError::Creation(CreationError::Zero))
+        );
     }
 
     #[test]
-    fn validate_team_score_2() {
-        let scores = build_scores_table(get_results());
-        let team = scores.get("Spain").unwrap();
-        assert_eq!(team.goals_scored, 0);
-        assert_eq!(team.goals_conceded, 2);
+    fn test_positive() {
+        let x = PositiveNonzeroInteger::new(42);
+        assert!(x.is_ok());
+        assert_eq!(parse_pos_nonzero("42"), Ok(x.unwrap()));
     }
 }
