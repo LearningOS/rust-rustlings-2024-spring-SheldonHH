@@ -1,16 +1,11 @@
 // rc1.rs
 //
-// In this exercise, we want to express the concept of multiple owners via the
-// Rc<T> type. This is a model of our solar system - there is a Sun type and
-// multiple Planets. The Planets take ownership of the sun, indicating that they
-// revolve around the sun.
+// 在这个练习中，我们想通过使用 Rc<T> 类型来表达多重所有权的概念。这是我们太阳系的一个模型 —— 有一个 Sun 类型和多个 Planet。
+// Planet 拥有对 sun 的所有权，表示它们绕太阳旋转。
 //
-// Make this code compile by using the proper Rc primitives to express that the
-// sun has multiple owners.
+// 通过适当使用 Rc 类型的方法使代码能编译通过。
 //
-// Execute `rustlings hint rc1` or use the `hint` watch subcommand for a hint.
-
-// I AM NOT DONE
+// 执行 `rustlings hint rc1` 或使用 `hint` 监视子命令获取提示。
 
 use std::rc::Rc;
 
@@ -34,71 +29,69 @@ impl Planet {
         println!("Hi from {:?}!", self)
     }
 }
-// 正确的做法应该是使用 Rc::clone(&sun) 来复制对现有 Sun 实例的引用，以保持所有行星共享同一个太阳实例的意图
+
 fn main() {
     let sun = Rc::new(Sun {});
-    println!("reference count = {}", Rc::strong_count(&sun)); // 1 reference
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 1 引用
 
     let mercury = Planet::Mercury(Rc::clone(&sun));
-    println!("reference count = {}", Rc::strong_count(&sun)); // 2 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 2 引用
     mercury.details();
 
     let venus = Planet::Venus(Rc::clone(&sun));
-    println!("reference count = {}", Rc::strong_count(&sun)); // 3 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 3 引用
     venus.details();
 
     let earth = Planet::Earth(Rc::clone(&sun));
-    println!("reference count = {}", Rc::strong_count(&sun)); // 4 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 4 引用
     earth.details();
 
     let mars = Planet::Mars(Rc::clone(&sun));
-    println!("reference count = {}", Rc::strong_count(&sun)); // 5 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 5 引用
     mars.details();
 
     let jupiter = Planet::Jupiter(Rc::clone(&sun));
-    println!("reference count = {}", Rc::strong_count(&sun)); // 6 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 6 引用
     jupiter.details();
 
-    // 修改TODO: 使用Rc::clone而不是Rc::new
     let saturn = Planet::Saturn(Rc::clone(&sun));
-    println!("reference count = {}", Rc::strong_count(&sun)); // 7 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 7 引用
     saturn.details();
 
-    // 修改TODO: 使用Rc::clone而不是Rc::new
     let uranus = Planet::Uranus(Rc::clone(&sun));
-    println!("reference count = {}", Rc::strong_count(&sun)); // 8 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 8 引用
     uranus.details();
 
-    // 修改TODO: 使用Rc::clone而不是Rc::new
     let neptune = Planet::Neptune(Rc::clone(&sun));
-    println!("reference count = {}", Rc::strong_count(&sun)); // 9 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 9 引用
     neptune.details();
 
     assert_eq!(Rc::strong_count(&sun), 9);
 
+    // 逐一删除 planet，观察引用计数的变化
     drop(neptune);
-    println!("reference count = {}", Rc::strong_count(&sun)); // 8 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 8 引用
 
     drop(uranus);
-    println!("reference count = {}", Rc::strong_count(&sun)); // 7 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 7 引用
 
     drop(saturn);
-    println!("reference count = {}", Rc::strong_count(&sun)); // 6 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 6 引用
 
     drop(jupiter);
-    println!("reference count = {}", Rc::strong_count(&sun)); // 5 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 5 引用
 
     drop(mars);
-    println!("reference count = {}", Rc::strong_count(&sun)); // 4 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 4 引用
 
     drop(earth);
-    println!("reference count = {}", Rc::strong_count(&sun)); // 3 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 3 引用
 
     drop(venus);
-    println!("reference count = {}", Rc::strong_count(&sun)); // 2 references
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 2 引用
 
     drop(mercury);
-    println!("reference count = {}", Rc::strong_count(&sun)); // 1 reference
+    println!("引用计数 = {}", Rc::strong_count(&sun)); // 1 引用
 
     assert_eq!(Rc::strong_count(&sun), 1);
 }
