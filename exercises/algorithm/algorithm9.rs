@@ -7,9 +7,12 @@
 use std::cmp::Ord;
 use std::default::Default;
 
+use std::cmp::Ord;
+use std::default::Default;
+
 pub struct Heap<T>
 where
-    T: Default,
+    T: Default + Ord, // 添加 Ord trait 来支持元素间的比较
 {
     count: usize,
     items: Vec<T>,
@@ -18,12 +21,12 @@ where
 
 impl<T> Heap<T>
 where
-    T: Default,
+    T: Default + Ord, // 添加 Ord trait 来支持元素间的比较
 {
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
             count: 0,
-            items: vec![T::default()],
+            items: vec![T::default()], // 用于简化索引处理，索引0不使用
             comparator,
         }
     }
@@ -37,7 +40,16 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        self.sift_up(self.count);
+    }
+
+    fn sift_up(&mut self, mut idx: usize) {
+        while idx > 1 && (self.comparator)(&self.items[self.parent_idx(idx)], &self.items[idx]) {
+            self.items.swap(idx, self.parent_idx(idx));
+            idx = self.parent_idx(idx);
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,10 +69,16 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left_idx = self.left_child_idx(idx);
+        let right_idx = self.right_child_idx(idx);
+        if right_idx <= self.count && (self.comparator)(&self.items[right_idx], &self.items[left_idx]) {
+            right_idx
+        } else {
+            left_idx
+        }
     }
 }
+
 
 impl<T> Heap<T>
 where
