@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,12 +36,13 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        self.items.push(value); // 将新元素添加到数组末尾
-        self.count += 1; // 堆大小加一
+        self.items.push(value);
+        self.count += 1;
         let mut idx = self.count;
+    
         while idx > 1 {
-            let parent_idx = self.parent_idx(idx); // 先计算父节点的索引
-            if (self.comparator)(&self.items[parent_idx], &self.items[idx]) {
+            let parent_idx = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
                 self.items.swap(idx, parent_idx);
                 idx = parent_idx;
             } else {
@@ -50,6 +50,8 @@ where
             }
         }
     }
+    
+    
 
     fn parent_idx(&self, idx: usize) -> usize {
         idx / 2
@@ -67,21 +69,18 @@ where
         self.left_child_idx(idx) + 1
     }
 
-    fn appropriate_child_idx(&self, idx: usize) -> usize {
+    fn smallest_child_idx(&self, idx: usize) -> usize {
         let left_idx = self.left_child_idx(idx);
         let right_idx = self.right_child_idx(idx);
-        if right_idx > self.count {
-            left_idx
+    
+        if right_idx <= self.count && (self.comparator)(&self.items[right_idx], &self.items[left_idx]) {
+            right_idx
         } else {
-            if (self.comparator)(&self.items[left_idx], &self.items[right_idx]) {
-                left_idx
-            } else {
-                right_idx
-            }
+            left_idx
         }
     }
+    
 }
-
 
 impl<T> Heap<T>
 where
@@ -97,6 +96,7 @@ where
         Self::new(|a, b| a > b)
     }
 }
+
 impl<T> Iterator for Heap<T>
 where
     T: Default,
@@ -104,30 +104,28 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        if self.is_empty() {
+        if self.count == 0 {
             None
-        } else {
-            let root = self.items.swap_remove(1); // 移除根节点
+        } else if let Some(last) = self.items.pop() {
+            let root = std::mem::replace(&mut self.items[1], last);
             self.count -= 1;
-            if !self.is_empty() {
-                let last_item = self.items.pop().unwrap(); // 先取出最后一个元素
-                if !self.items.is_empty() {
-                    self.items.insert(1, last_item); // 再将其插入到根节点位置
-                    let mut idx = 1;
-                    while self.children_present(idx) {
-                        let small_idx = self.appropriate_child_idx(idx);
-                        if (self.comparator)(&self.items[small_idx], &self.items[idx]) {
-                            self.items.swap(idx, small_idx);
-                            idx = small_idx;
-                        } else {
-                            break;
-                        }
-                    }
+            let mut idx = 1;
+            while self.children_present(idx) {
+                let smaller_child_idx = self.smallest_child_idx(idx);
+                if (self.comparator)(&self.items[smaller_child_idx], &self.items[idx]) {
+                    self.items.swap(idx, smaller_child_idx);
+                    idx = smaller_child_idx;
+                } else {
+                    break;
                 }
             }
             Some(root)
+        } else {
+            None
         }
     }
+    
+    
 }
 
 pub struct MinHeap;
@@ -154,7 +152,6 @@ impl MaxHeap {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -172,7 +169,7 @@ mod tests {
         heap.add(9);
         heap.add(11);
         assert_eq!(heap.len(), 4);
-        assert_eq!(heap.next(), Some(11));
+        assert_eq!(heap.next(), Some(2));
         assert_eq!(heap.next(), Some(4));
         assert_eq!(heap.next(), Some(9));
         heap.add(1);
