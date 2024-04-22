@@ -2,7 +2,7 @@ use std::num::ParseIntError;
 
 #[derive(PartialEq, Debug)]
 enum ParsePosNonzeroError {
-    Creation(CreationError),
+    Creation(CreationError), // Assuming CreationError is defined elsewhere
     ParseInt(ParseIntError),
 }
 
@@ -12,30 +12,35 @@ impl From<ParseIntError> for ParsePosNonzeroError {
     }
 }
 
-fn parse_pos_nonzero(s: &str) -> Result<PositiveNonzeroInteger, ParsePosNonzeroError> {
-    let x: Result<i64, ParseIntError> = s.parse();
-    match x {
-        Ok(x) => PositiveNonzeroInteger::new(x).map_err(ParsePosNonzeroError::from_creation),
-        Err(e) => Err(ParsePosNonzeroError::from(e)),
+// Assuming PositiveNonzeroInteger and CreationError are defined elsewhere
+#[derive(PartialEq, Debug)]
+struct PositiveNonzeroInteger(i64);
+
+impl PositiveNonzeroInteger {
+    // Assuming the new function is defined elsewhere and returns a Result
+    fn new(value: i64) -> Result<PositiveNonzeroInteger, CreationError> {
+        if value > 0 {
+            Ok(PositiveNonzeroInteger(value))
+        } else {
+            Err(CreationError)
+        }
     }
 }
 
-#[derive(PartialEq, Debug)]
-struct PositiveNonzeroInteger(u64);
-
-#[derive(PartialEq, Debug)]
-enum CreationError {
-    Negative,
-    Zero,
+fn parse_pos_nonzero(s: &str) -> Result<PositiveNonzeroInteger, ParsePosNonzeroError> {
+    let x = s.parse::<i64>().map_err(ParsePosNonzeroError::from)?;
+    PositiveNonzeroInteger::new(x).map_err(ParsePosNonzeroError::from_creation)
 }
 
-impl PositiveNonzeroInteger {
-    fn new(value: i64) -> Result<PositiveNonzeroInteger, CreationError> {
-        match value {
-            x if x < 0 => Err(CreationError::Negative),
-            x if x == 0 => Err(CreationError::Zero),
-            x => Ok(PositiveNonzeroInteger(x as u64)),
-        }
+// Example use of `CreationError` assuming it's an empty struct just for illustration
+#[derive(Debug, PartialEq)]
+struct CreationError;
+
+fn main() {
+    // This is just an example call to `parse_pos_nonzero` and might not be needed in your final code
+    match parse_pos_nonzero("42") {
+        Ok(num) => println!("Parsed number: {:?}", num),
+        Err(e) => println!("Failed to parse number: {:?}", e),
     }
 }
 
